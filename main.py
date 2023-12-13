@@ -3,7 +3,6 @@ import httpx
 
 app = FastAPI()
 
-
 def get_custom_pokemon_data(response: dict, name=None, abilities=None, id=None, sprites=None, type=None):
     data = {
         "Nombre del pokemon": name if name is not None else response["name"],
@@ -14,11 +13,11 @@ def get_custom_pokemon_data(response: dict, name=None, abilities=None, id=None, 
     }
     return data
 
-
 @app.get("/")
-async def pokemon(
+async def get_pokemon(
     id: int = Query(None, title="Pokedex ID", description="ID del pokedex", gt=0),
     name: str = Query(None, title="Nombre del pokemon", description="Nombre del pokemon"),
+    limit: int = Query(None, title="limit", description="limit", gt=0),
 ):
     base_url = "https://pokeapi.co/api/v2/pokemon"
     if id is not None:
@@ -39,7 +38,7 @@ async def pokemon(
                     "Tipo": [pokemon["type"]["name"] for pokemon in pokemon_data["types"]],
                 }
             else:
-                response = await client.get(base_url + f"?limit={pokemon_data['count']}")
+                response = await client.get(base_url + f"?limit={limit if limit else pokemon_data['count']}")
                 response.raise_for_status()
                 pokemon_data = response.json()
                 data = {
