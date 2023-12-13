@@ -4,6 +4,14 @@ import httpx
 app = FastAPI()
 
 def get_custom_pokemon_data(response: dict, name=None, abilities=None, id=None, sprites=None, type=None):
+    """
+        Esta funcion organiza la informacion del pokemon segun tempate
+            "Nombre del pokemon":
+            "Habilidades":
+            "Número de la pokedex":
+            "Sprites":
+            "Tipo":
+    """
     data = {
         "Nombre del pokemon": name if name is not None else response["name"],
         "Habilidades": abilities if abilities is not None else [pokemon["ability"]["name"] for pokemon in response["abilities"]],
@@ -19,6 +27,13 @@ async def get_pokemon(
     name: str = Query(None, title="Nombre del pokemon", description="Nombre del pokemon"),
     limit: int = Query(None, title="limit", description="limit", gt=0),
 ):
+    """
+        endpoint "/" con 3 parametros opcionales: id, name, limit
+            1- Si se pasa el parámetro 'id' devuelve los datos del pokemon correspondiente
+            2- Si se pasa el parámetro 'name' devuelve los datos del pokemon correspondiente
+            3- Si se pasa el parámetro 'limit' devuelve el numero de pokemones especificados
+            4- En caso de no pasar ningun parametro, devuelve todos los pokemones
+    """
     base_url = "https://pokeapi.co/api/v2/pokemon"
     if id is not None:
         base_url += f"/{id}"
@@ -56,6 +71,15 @@ async def update_pokemon_data(
     sprites: str = Query(None, title="sprites del pokemon", description="sprites del pokemon"),
     type: str = Query(None, title="Tipo del pokemon", description="Tipo del pokemon"),
 ):
+    """
+        endpoint "/update_pokemon" con 1 parametro obligatorio y 4 parametros opcionales, Este endpoint permite modificar la informacion de pokemon
+        parametros:
+        1- id: Obligatorio se usa para buscar el pokemon
+        2- name: Opcional parametro para modificar informacion 
+        3- abilities: Opcional parametro para modificar informacion 
+        4- sprites: Opcional parametro para modificar informacion 
+        5- type: Opcional parametro para modificar informacion 
+    """
     base_url = f"https://pokeapi.co/api/v2/pokemon/{id}"
     async with httpx.AsyncClient() as client:
         try:
